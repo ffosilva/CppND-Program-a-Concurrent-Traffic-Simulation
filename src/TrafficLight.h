@@ -9,6 +9,7 @@
 // forward declarations to avoid include cycle
 class Vehicle;
 
+// source: from building a generic message queue exercise
 template <class T>
 class MessageQueue
 {
@@ -58,11 +59,11 @@ public:
     TrafficLight();
 
     // getters / setters
+    TrafficLightPhase getCurrentPhase();
 
     // typical behaviour methods
     void waitForGreen();
     void simulate();
-    TrafficLightPhase getCurrentPhase();
 
 private:
     // typical behaviour methods
