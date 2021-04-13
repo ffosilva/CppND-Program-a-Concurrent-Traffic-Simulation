@@ -36,7 +36,6 @@ void MessageQueue<T>::send(T &&msg)
 
 /* Implementation of class "TrafficLight" */
 
-
 TrafficLight::TrafficLight()
 {
     _currentPhase = TrafficLightPhase::red;
@@ -44,13 +43,15 @@ TrafficLight::TrafficLight()
 
 void TrafficLight::waitForGreen()
 {
-    while(true){
-        
+    while (true)
+    {
+
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         auto currentLight = _messageQueue.receive();
 
-        if(currentLight == TrafficLightPhase::green){
+        if (currentLight == TrafficLightPhase::green)
+        {
             return;
         }
     }
@@ -63,14 +64,31 @@ TrafficLightPhase TrafficLight::getCurrentPhase()
 
 void TrafficLight::simulate()
 {
-   threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
+    threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
 }
 
 // virtual function which is executed in a thread
 void TrafficLight::cycleThroughPhases()
 {
-    // FP.2a : Implement the function with an infinite loop that measures the time between two loop cycles 
-    // and toggles the current phase of the traffic light between red and green and sends an update method 
-    // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds. 
-    // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
+    while (true)
+    {
+        float minSleep = 4000;
+        float maxSleep = 6000;
+        float deltaMs = maxSleep - minSleep;
+        // time between 4 and 6
+        float phaseTime = ((((float)rand()) / (float)RAND_MAX) * deltaMs) + minSleep;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(phaseTime)));
+
+        if (getCurrentPhase() == TrafficLightPhase::red)
+        {
+            _currentPhase = TrafficLightPhase::green;
+        }
+        else
+        {
+            _currentPhase = TrafficLightPhase::red;
+        }
+
+        _messageQueue.send(std::move(_currentPhase));
+    }
 }
